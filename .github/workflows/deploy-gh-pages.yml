@@ -1,53 +1,44 @@
 name: Deploy react to Github pages
-on: 
+
+on:
     push:
         branches: ["master"]
 
-# rättigheter för att få skriva till gh-pages
-
-
 jobs:
     build:
-    # ubuuntu
         runs-on: ubuntu-latest
 
         permissions:
             contents: read
 
-        steps: # checkout
+        steps:
             - name: Checkout
               uses: actions/checkout@v4
 
-        # installera node
-            - name : Set up node
+            - name: Set up node
               uses: actions/setup-node@v4
               with:
                   node-version: 20
                   cache: 'npm'
 
-        # installera dependencies npm install
             - name: Install dependencies
               run: npm ci
 
-        # build - npm run build => ./dist
             - name: Build
               run: npm run build
 
-        # ladda upp ./dist
             - name: Upload artifacts
-              uses: actions/upload-pages-artifact@v5
+              uses: actions/upload-pages-artifact@v3
               with:
-                path: './dist'
+                  path: './dist'
 
-
-        # ta /dist publisera på gh pages
     deploy:
         environment:
             name: github-pages
-            url: ${{steps.deployment.outputs.page_url}}
+            url: ${{ steps.deployment.outputs.page_url }}
 
         runs-on: ubuntu-latest
-        needs: build # tvinga väntan på att build-jobbet är klart
+        needs: build
 
         permissions:
             pages: write
@@ -57,3 +48,4 @@ jobs:
             - name: Deploy to gh pages
               id: deployment
               uses: actions/deploy-pages@v4
+              
